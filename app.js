@@ -60,14 +60,40 @@ app.use('/ext/getmoneysupply', function(req,res){
 app.use('/ext/getaddress/:hash', function(req,res){
   db.get_address(req.param('hash'), function(address){
     if (address) {
-      var a_ext = {
-        address: address.a_id,
-        sent: (address.sent / 100000000),
-        received: (address.received / 100000000),
-        balance: (address.balance / 100000000).toString().replace(/(^-+)/mg, ''),
-        last_txs: address.txs,
-      };
-      res.send(a_ext);
+
+      var txs = [];
+      var hashes = address.txs.reverse();
+
+      count = address.txs.length;
+
+      lib.syncLoop(count, function (loop) {
+        var i = loop.iteration();
+        db.get_tx(hashes[i].addresses, function(tx) {
+          if (tx) {
+            txs.push(tx);
+            loop.next();
+          } else {
+            loop.next();
+          }
+        });
+      }, function(){
+
+        var a_ext = {
+
+          address: address.a_id,
+          sent: (address.sent / 100000000),
+          received: (address.received / 100000000),
+          balance: (address.balance / 100000000).toString().replace(/(^-+)/mg, ''),
+          newTXS: txs,
+          last_txs:  address.txs,
+        };
+        res.send(a_ext);
+      });
+
+          //}
+        //})
+      //}
+
     } else {
       res.send({ error: 'address not found.', hash: req.param('hash')})
     }
