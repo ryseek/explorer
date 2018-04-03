@@ -77,17 +77,19 @@ app.use('/ext/getaddress/:hash', function(req,res){
           }
         });
       }, function(){
+        lib.get_blockcount( function (currentHeight) {
+          var a_ext = {
 
-        var a_ext = {
-
-          address: address.a_id,
-          sent: (address.sent / 100000000),
-          received: (address.received / 100000000),
-          balance: (address.balance / 100000000).toString().replace(/(^-+)/mg, ''),
-          newTXS: txs,
-          last_txs:  address.txs,
-        };
-        res.send(a_ext);
+            address: address.a_id,
+            sent: (address.sent / 100000000),
+            received: (address.received / 100000000),
+            balance: (address.balance / 100000000).toString().replace(/(^-+)/mg, ''),
+            current_block: (currentHeight),
+            last_txs_full: txs,
+            last_txs:  address.txs,
+          };
+          res.send(a_ext);
+        })
       });
 
           //}
