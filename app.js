@@ -129,9 +129,9 @@ app.use('/ext/getaddress/:hash', function(req,res){
               balance: (address.balance / 100000000).toString().replace(/(^-+)/mg, ''),
               current_block: (currentHeight),
               last_txs_full: txs,
-              last_txs:  address.txs,
+//              last_txs:  address.txs,
               list_unspent: unspent_txs,
-              list_raw_txs: listRaw,
+//              list_raw_txs: listRaw,
             };
             res.send(a_ext);
           });
