@@ -71,30 +71,72 @@ app.use('/ext/getaddress/:hash', function(req,res){
         db.get_tx(hashes[i].addresses, function(tx) {
           if (tx) {
             txs.push(tx);
+            console.log("transaction:" + i);
             loop.next();
           } else {
             loop.next();
           }
         });
+
       }, function(){
-        lib.get_blockcount( function (currentHeight) {
-          var a_ext = {
+        var listRaw = []
+        count = address.txs.length;
+        lib.syncLoop(count, function (loop) {
+          var i = loop.iteration();
 
-            address: address.a_id,
-            sent: (address.sent / 100000000),
-            received: (address.received / 100000000),
-            balance: (address.balance / 100000000).toString().replace(/(^-+)/mg, ''),
-            current_block: (currentHeight),
-            last_txs_full: txs,
-            last_txs:  address.txs,
-          };
-          res.send(a_ext);
-        })
+          lib.get_rawtransaction(txs[i].txid, function(yas) {
+            if (yas){
+              console.log("raw transaction:" + i);
+              listRaw.push(yas)
+            }
+              loop.next();
+          })
+        }, function() {
+          console.log("done");
+          var i;
+          var alltxs = listRaw.reverse();
+          var alltxid = [];
+          var unspent_txs = [];
+          for (i = 0; i < alltxs.length; i++) {
+            console.log("inspecting transactions: " + i);
+            console.log(alltxs[i].txid);
+            alltxid.push(alltxs[i].txid)
+            var j;
+            for (j = 0; j < alltxs[i].vin.length; j++){
+              //console.log(unspent_txs[i].vin[j].txid);
+              for (var k in alltxid){
+                if (alltxid[k] == alltxs[i].vin[j].txid) {
+                  console.log(alltxid[k] + " is spent ")
+                  alltxid.splice(k,1);
+                }
+              }
+            }
+          }
+          for (var i in alltxid){
+            console.log(alltxid[i] + " is unspent ")
+            for (var k in alltxs){
+              if (alltxs[k].txid === alltxid[i]){
+                unspent_txs.push(alltxs[k])
+              }
+            }
+          }
+          lib.get_blockcount( function (currentHeight) {
+
+            var a_ext = {
+
+              sent: (address.sent / 100000000),
+              received: (address.received / 100000000),
+              balance: (address.balance / 100000000).toString().replace(/(^-+)/mg, ''),
+              current_block: (currentHeight),
+              last_txs_full: txs,
+              last_txs:  address.txs,
+              list_unspent: unspent_txs,
+              list_raw_txs: listRaw,
+            };
+            res.send(a_ext);
+          });
+        });
       });
-
-          //}
-        //})
-      //}
 
     } else {
       res.send({ error: 'address not found.', hash: req.param('hash')})
