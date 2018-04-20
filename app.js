@@ -108,15 +108,16 @@ app.use('/ext/getaddress/:hash', function(req,res){
               for (var k in alltxid){
                 if (alltxid[k] == alltxs[i].vin[j].txid) {
                   // check if this address was as VOUT
+                  console.log("Suspicious txid" + alltxs[i].vin[j].txid);
                   var voutN = alltxs[i].vin[j].vout;
 
                   lib.get_rawtransaction(alltxs[i].vin[j].txid, function(yas) {
                     if (yas){
                       if (yas.vout[voutN].scriptPubKey.addresses[0] === address.a_id){
                           alltxid.splice(k,1);
-                          console.log(alltxid[k] + " is spent ")
+                          console.log(alltxid[k] + " is spent ");
                       } else{
-                          console.log(alltxid[k] + " is not spent ")
+                          console.log(alltxid[k] + " is not spent ");
                       }
                     }
 
