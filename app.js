@@ -111,19 +111,9 @@ app.use('/ext/getaddress/:hash', function(req,res){
                   console.log("Suspicious txid" + alltxs[i].vin[j].txid);
                   var voutN = alltxs[i].vin[j].vout;
 
-                  lib.get_rawtransaction(alltxs[i].vin[j].txid, function(yas) {
-                    if (yas){
-                      if (yas.vout[voutN].scriptPubKey.addresses[0] === address.a_id){
-                          alltxid.splice(k,1);
-                          console.log(alltxid[k] + " is spent ");
-                      } else{
-                          console.log(alltxid[k] + " is not spent ");
-                      }
-                    }
 
-                  });
-                  //console.log(alltxid[k] + " is spent ")
-                //  alltxid.splice(k,1);
+                  console.log(alltxid[k] + " is spent ")
+                  alltxid.splice(k,1);
                 }
               }
             }
