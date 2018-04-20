@@ -93,6 +93,7 @@ app.use('/ext/getaddress/:hash', function(req,res){
           })
         }, function() {
           console.log("done");
+          console.log(address.a_id)
           var i;
           var alltxs = listRaw.reverse();
           var alltxid = [];
