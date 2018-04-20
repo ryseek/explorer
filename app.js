@@ -111,9 +111,17 @@ app.use('/ext/getaddress/:hash', function(req,res){
                   console.log("Suspicious txid" + alltxs[i].vin[j].txid);
                   var voutN = alltxs[i].vin[j].vout;
 
+                  for (var t in txs) {
+                    if (txs[t].txid === alltxs[i].vin[j].txid) {
+                      if (txs[t].vout[voutN].addresses === address.a_id) {
+                        console.log(alltxid[k] + " is spent ");
+                        alltxid.splice(k,1);
+                      }else{
+                        console.log(alltxid[k] + " is unspent ");
+                      }
+                    }
+                  }
 
-                  console.log(alltxid[k] + " is spent ")
-                  alltxid.splice(k,1);
                 }
               }
             }
